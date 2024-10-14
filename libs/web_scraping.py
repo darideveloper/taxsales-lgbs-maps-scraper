@@ -25,7 +25,6 @@ class WebScraping ():
                  download_folder: str = "", extensions: list = [],
                  incognito: bool = False, experimentals: bool = True,
                  start_killing: bool = False, start_openning: bool = True,
-                 width: int = 1280, height: int = 720,
                  mute: bool = True, auto_chrome_folder_windows: bool = False):
         
         """ Save settings and create a new instance of the web browser
@@ -45,8 +44,6 @@ class WebScraping ():
             experimentals (bool, optional): Activate the experimentals. Defaults to True.
             start_killing (bool, optional): Kill chrome when starts. Defaults to False.
             start_openning (bool, optional): Open chrome before starts. Defaults to True.
-            width (int, optional): Width of the window. Defaults to 1280.
-            height (int, optional): Height of the window. Defaults to 720.
             mute (bool, optional): Mute the audio of the window. Defaults to True.
         """
 
@@ -67,8 +64,6 @@ class WebScraping ():
         self.__incognito__ = incognito
         self.__experimentals__ = experimentals
         self.__start_openning__ = start_openning
-        self.__width__ = width
-        self.__height__ = height
         self.__mute__ = mute
         
         self.__web_page__ = None
@@ -168,10 +163,6 @@ class WebScraping ():
                     'useAutomationExtension',
                     False
                 )
-
-            # screen size
-            size_option = f"--window-size={self.__width__},{self.__height__}"
-            WebScraping.options.add_argument(size_option)
             
             # headless mode
             if self.__headless__:

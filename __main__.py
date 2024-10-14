@@ -22,20 +22,44 @@ def main():
     print("Taxsales Lgbs Bot")
     print("----------------------------------\n")
 
+    # SCraping counters
+    current_property = 1
+    current_page = 1
+
     # Initialize the scraper
     scraper = Scraper(PAGE_LINK)
     
     while True:
         
+        print(f"Scraping page {current_page}...")
+        
         # Extract the properties from current results page
-        for property_index in range(2, 11):
+        for property_index in range(2, 12):
+            
+            # Open property details
             property_found = scraper.open_property_details(property_index)
             if not property_found:
                 break
-            data = scraper.get_property_data()
-            print(data)
+            print(f"\tScraping property {current_property}...")
+            
+            # data = scraper.get_property_data()
+            
             # scraper.save_data(data, SHEET_OUTPUT)
             scraper.close_property_details()
+            
+            sleep(WAIT_SECONDS)
+            
+            current_property += 1
+            
+        # Go to next results page
+        has_next = scraper.go_next_page()
+        if not has_next:
+            print("No more results. Done.")
+            break
+        
+        current_page += 1
+
+    print("\n----------------------------------")
     
 
 if __name__ == "__main__":
