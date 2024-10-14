@@ -42,13 +42,15 @@ def main():
                 break
             print(f"\tScraping property {current_property}...")
             
-            # data = scraper.get_property_data()
+            # Extract property data
+            data = scraper.get_property_data()
+            if data:
+                # TODO: save data to excel
+                print(data)
             
-            # scraper.save_data(data, SHEET_OUTPUT)
+            # Close property details and wait
             scraper.close_property_details()
-            
             sleep(WAIT_SECONDS)
-            
             current_property += 1
             
         # Go to next results page
@@ -56,7 +58,6 @@ def main():
         if not has_next:
             print("No more results. Done.")
             break
-        
         current_page += 1
 
     print("\n----------------------------------")

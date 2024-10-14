@@ -66,10 +66,96 @@ class Scraper(WebScraping):
         # Raise error if no results
         raise print("Error: No results found.")
                 
-    def get_property_data(self):
-        """ Extract data from current opened result """
-        sleep(3)
-        return {}
+    def get_property_data(self) -> dict:
+        """ Extract data from current opened result
+        
+        Returns:
+            dict: property data
+                street (str): street address
+                city (str): city
+                state (str): state
+                zip_code (str): zip code
+                county (str): county
+                maps_link (str): link to google maps
+                sale_date (str): date of the sale
+                status (str): status of the property
+                sale_notes (str): notes about the sale
+                judgment_date (str): date of the judgment
+                adjudget_value (float): value of the adjudget
+                es_min_bid (float): estimated minimum bid
+                equity (float): (adjudget_value - es_min_bid)
+                equity_percent (float): (equity / adjudget_value) * 100
+                account_number (int): account number
+                case_number (str): case number
+                case_style (str): case style
+        """
+        
+        selectors = {
+            "address": 'h1',
+            "county": 'dd:nth-child(2)',
+            "maps_link": 'a[href^="https://www.google.com/maps/"]',
+            "sale_date": 'dd:nth-child(6)',
+            "status": 'dd:nth-child(14)',
+            "sale_notes": 'h3 + dl dd:last-child',
+            "judgment_date": 'h3 + dl dd:nth-child(16)',
+            "adjudget_value": 'dd:nth-child(10)',
+            "es_min_bid": 'dd:nth-child(12)',
+            'account_number': 'dd:nth-child(8)',
+            'cause_number': 'h3 + dl dd:nth-child(8)',
+            'case_style': 'h3 + dl dd:nth-child(14)',
+        }
+        
+        raw_data = {}
+        for field, selector in selectors.items():
+            raw_data[field] = self.get_text(selector)
+            
+        # Extract address data
+        try:
+            address_parts = raw_data["address"].split(",")
+            street = address_parts[0]
+            address_parts = address_parts[1].split("-")
+            address_parts = address_parts[0].strip().split()
+            postal_code = address_parts[-1]
+            state = address_parts[-2]
+            city = " ".join(address_parts[:-2])
+        except Exception:
+            print("\t\tError: Address format not recognized. Skipping property.")
+            return {}
+        
+        # Get google maps link
+        maps_link = self.get_attrib(selectors["maps_link"], "href")
+        
+        # Calculate equity and fix quantities
+        if not raw_data["adjudget_value"]:
+            raw_data["adjudget_value"] = "$0"
+        if not raw_data["es_min_bid"]:
+            raw_data["es_min_bid"] = "$0"
+        adjudget_value_str = raw_data["adjudget_value"].replace("$", "").replace(",", "")
+        es_min_bid_str = raw_data["es_min_bid"].replace("$", "").replace(",", "")
+        adjudget_value = float(adjudget_value_str)
+        es_min_bid = float(es_min_bid_str)
+        equity = adjudget_value - es_min_bid
+        equity_percent = int(equity / adjudget_value) * 100
+        
+        return {
+            "street": street,
+            "city": city,
+            "state": state,
+            "zip_code": postal_code,
+            "county": raw_data["county"],
+            "maps_link": maps_link,
+            "sale_date": raw_data["sale_date"],
+            "status": raw_data["status"],
+            "sale_notes": raw_data["sale_notes"],
+            "judgment_date": raw_data["judgment_date"],
+            "adjudget_value": f"${adjudget_value}",
+            "es_min_bid": f"${es_min_bid}",
+            "equity": f"${equity}",
+            "equity_percent": f"{equity_percent}%",
+            "account_number": raw_data["account_number"],
+            "case_number": raw_data["cause_number"],
+            "case_style": raw_data["case_style"],
+        }
     
     def open_property_details(self, property_index: int) -> bool:
         """ Open the details of a property.
