@@ -28,7 +28,7 @@ class Scraper(WebScraping):
         
         # Global data
         self.global_selectors = {
-            "result": '.row'
+            "result": '.result-body > .ng-scope:not(div)'
         }
         
         # Load page
@@ -36,9 +36,12 @@ class Scraper(WebScraping):
         sleep(2)
         self.refresh_selenium()
         
-        # Main loop
+        # Prepare the scraper
         self.__accept_terms__()
         self.__wait_load__()
+        
+        # Run scraper main loop
+        self.scrape_properties()
     
     def __accept_terms__(self):
         """ Accept the terms of service. """
@@ -65,8 +68,38 @@ class Scraper(WebScraping):
             
         # Raise error if no results
         raise print("Error: No results found.")
+                
+    def __get_property_data__(self):
+        """ Extract data from current opened result """
+        pass
+    
+    def scrape_properties(self):
         
+        selectors = {
+            "link": 'a',
+            "details_btn": '[ng-click="popups.openDetailModal()"]',
+            "close_btn": '[ng-click="detailmodal.close()"]'
+        }
         
+        # Loop rows skipping the header and the navigation
+        for row_index in range(2, 11):
+            
+            # Show row in map
+            row_selector = f"{self.global_selectors["result"]}:nth-child({row_index})"
+            row_link = f"{row_selector} {selectors['link']}"
+            self.click_js(row_link)
+            self.refresh_selenium()
+            
+            # Open details
+            self.click_js(selectors["details_btn"])
+            self.refresh_selenium()
+            
+            data = self.__get_property_data__()
+            
+            # Close details tab
+            self.click_js(selectors["close_btn"])
+            self.refresh_selenium()
+            
 
 
 if __name__ == "__main__":
