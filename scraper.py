@@ -39,9 +39,6 @@ class Scraper(WebScraping):
         # Prepare the scraper
         self.__accept_terms__()
         self.__wait_load__()
-        
-        # Run scraper main loop
-        self.scrape_properties()
     
     def __accept_terms__(self):
         """ Accept the terms of service. """
@@ -69,39 +66,51 @@ class Scraper(WebScraping):
         # Raise error if no results
         raise print("Error: No results found.")
                 
-    def __get_property_data__(self):
+    def get_property_data(self):
         """ Extract data from current opened result """
-        pass
+        sleep(3)
+        return {}
     
-    def scrape_properties(self):
+    def open_property_details(self, property_index: int) -> bool:
+        """ Open the details of a property.
+
+        Args:
+            property_index (int): index of the property to open
+
+        Returns:
+            bool: True if the property was found and opened, False otherwise
+        """
         
         selectors = {
             "link": 'a',
             "details_btn": '[ng-click="popups.openDetailModal()"]',
-            "close_btn": '[ng-click="detailmodal.close()"]'
         }
         
-        # Loop rows skipping the header and the navigation
-        for row_index in range(2, 11):
+        # generate selectors
+        row_selector = f"{self.global_selectors["result"]}:nth-child({property_index})"
+        row_link = f"{row_selector} {selectors['link']}"
+        is_row_link = self.get_elem(row_link)
+        
+        # Validate if row is a link
+        if not is_row_link:
+            return False
+        
+        # Open details
+        self.click_js(row_link)
+        self.refresh_selenium()
+        self.click_js(selectors["details_btn"])
+        sleep(2)
+        self.refresh_selenium()
+        
+        return True
+    
+    def close_property_details(self):
+        """ Close the details of a property. """
+        
+        selectors = {
+            "close_btn": '[ng-click="detailmodal.close()"]',
+        }
             
-            # Show row in map
-            row_selector = f"{self.global_selectors["result"]}:nth-child({row_index})"
-            row_link = f"{row_selector} {selectors['link']}"
-            self.click_js(row_link)
-            self.refresh_selenium()
-            
-            # Open details
-            self.click_js(selectors["details_btn"])
-            self.refresh_selenium()
-            
-            data = self.__get_property_data__()
-            
-            # Close details tab
-            self.click_js(selectors["close_btn"])
-            self.refresh_selenium()
-            
-
-
-if __name__ == "__main__":
-    # Test the scraper
-    scraper = Scraper("https://taxsales.lgbs.com/map?lat=34.085100353427414&lon=-97.84238746874999&zoom=6&offset=0&ordering=precinct,sale_nbr,uid&sale_type=SALE,RESALE,STRUCK%20OFF,FUTURE%20SALE&in_bbox=-108.91660621874999,26.25957324631036,-86.76816871874999,41.24943669001917")
+        # Close details tab
+        self.click_js(selectors["close_btn"])
+        self.refresh_selenium()
