@@ -3,8 +3,8 @@ from time import sleep
 
 from dotenv import load_dotenv
 
-from scraper import Scraper
-from libs.google_sheets import SheetsManager
+from libs.scraper import Scraper
+from libs.data_manager import DataManager
 
 # Env variables
 load_dotenv()
@@ -31,12 +31,12 @@ def main():
     current_property = 1
     current_page = 1
 
-    # Initialize the scraper and google sheets manager
+    # Initialize libraries
     scraper = Scraper(PAGE_LINK)
-    google_sheet = SheetsManager(GOOGLE_SHEET_LINK, credentials_path, SHEET_OUTPUT)
+    data_manager = DataManager(GOOGLE_SHEET_LINK, credentials_path, SHEET_OUTPUT)
     
     # get last row
-    last_row = google_sheet.get_rows_num()
+    last_row = data_manager.get_rows_num()
     
     while True:
         
@@ -54,11 +54,34 @@ def main():
             # Extract property data
             data = scraper.get_property_data()
             if data:
+                
+                # Validate new case status
+                print("\t\tValidating case status...")
+                case_number = data["case_number"]
+                old_status = data_manager.get_case_status(case_number)
+                new_status = data["status"]
+                status_change = False
+                
+                if old_status and old_status != new_status:
+                    status_change = True
+                    data["status_change"] = "Yes"
+                    
+                # Log status change
+                if status_change:
+                    print("\t\tSaving status change...")
+                else:
+                    print("\t\tNo status change")
+                
                 # Format and save data in google sheets
-                print(f"\t\tSaving property {current_property}...")
-                current_row = last_row + current_property
+                print("\t\tSaving property...")
+                current_row = last_row + current_property - 1
                 data_row = data.values()
-                google_sheet.write_data([data_row], current_row)
+                
+                # Update or insert data
+                if status_change:
+                    data_manager.write_data([data_row], current_row)
+                else:
+                    data_manager.write_data([data_row], current_row)
             
             # Close property details and wait
             scraper.close_property_details()
