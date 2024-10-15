@@ -55,9 +55,10 @@ def main():
             data = scraper.get_property_data()
             if data:
                 # Format and save data in google sheets
+                print(f"\t\tSaving property {current_property}...")
                 current_row = last_row + current_property
                 data_row = data.values()
-                google_sheet.write_data(current_row, data_row)
+                google_sheet.write_data([data_row], current_row)
             
             # Close property details and wait
             scraper.close_property_details()
