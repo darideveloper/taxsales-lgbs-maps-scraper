@@ -35,9 +35,6 @@ def main():
     scraper = Scraper(PAGE_LINK)
     data_manager = DataManager(GOOGLE_SHEET_LINK, credentials_path, SHEET_OUTPUT)
     
-    # get last row
-    last_row = data_manager.get_rows_num()
-    
     while True:
         
         print(f"Scraping page {current_page}...")
@@ -71,17 +68,14 @@ def main():
                     print("\t\tSaving status change...")
                 else:
                     print("\t\tNo status change")
-                
-                # Format and save data in google sheets
-                print("\t\tSaving property...")
-                current_row = last_row + current_property - 1
-                data_row = data.values()
-                
+                                
                 # Update or insert data
-                if status_change:
-                    data_manager.write_data([data_row], current_row)
+                if old_status:
+                    print("\t\tUpdating property...")
+                    data_manager.update_property(data)
                 else:
-                    data_manager.write_data([data_row], current_row)
+                    print("\t\tSaving property...")
+                    data_manager.insert_property(data)
             
             # Close property details and wait
             scraper.close_property_details()
