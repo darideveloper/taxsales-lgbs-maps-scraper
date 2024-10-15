@@ -4,6 +4,7 @@ from time import sleep
 from dotenv import load_dotenv
 
 from scraper import Scraper
+from libs.google_sheets import SheetsManager
 
 # Env variables
 load_dotenv()
@@ -21,13 +22,21 @@ def main():
     print("\n----------------------------------")
     print("Taxsales Lgbs Bot")
     print("----------------------------------\n")
+    
+    # Paths
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    credentials_path = os.path.join(current_path, "credentials.json")
 
     # SCraping counters
     current_property = 1
     current_page = 1
 
-    # Initialize the scraper
+    # Initialize the scraper and google sheets manager
     scraper = Scraper(PAGE_LINK)
+    google_sheet = SheetsManager(GOOGLE_SHEET_LINK, credentials_path, SHEET_OUTPUT)
+    
+    # get last row
+    last_row = google_sheet.get_rows_num()
     
     while True:
         
@@ -45,8 +54,10 @@ def main():
             # Extract property data
             data = scraper.get_property_data()
             if data:
-                # TODO: save data to excel
-                print(data)
+                # Format and save data in google sheets
+                current_row = last_row + current_property
+                data_row = data.values()
+                google_sheet.write_data(current_row, data_row)
             
             # Close property details and wait
             scraper.close_property_details()
