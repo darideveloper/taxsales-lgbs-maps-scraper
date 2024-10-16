@@ -31,6 +31,7 @@ class Scraper(WebScraping):
         }
         
         # Load page
+        self.page_link = page_link
         self.set_page(page_link)
         sleep(2)
         self.refresh_selenium()
@@ -160,6 +161,7 @@ class Scraper(WebScraping):
             "account_number": raw_data["account_number"],
             "case_number": raw_data["cause_number"],
             "case_style": raw_data["case_style"],
+            "link": self.page_link,
         }
     
     def open_property_details(self, property_index: int) -> bool:
