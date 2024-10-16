@@ -136,7 +136,9 @@ class Scraper(WebScraping):
         adjudget_value = float(adjudget_value_str)
         es_min_bid = float(es_min_bid_str)
         equity = adjudget_value - es_min_bid
-        equity_percent = int(equity / adjudget_value) * 100
+        equity_percent = 0
+        if equity_percent > 0:
+            equity_percent = int(equity / adjudget_value) * 100
         
         return {
             "street": street,

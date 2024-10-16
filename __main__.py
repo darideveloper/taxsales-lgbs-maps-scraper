@@ -53,11 +53,11 @@ def main():
             if data:
                 
                 # Validate new case status
-                print("\t\tValidating case status...")
                 case_number = data["case_number"]
                 old_status = data_manager.get_case_status(case_number)
                 new_status = data["status"]
                 status_change = False
+                print(f"\t\tValidating case '{case_number}' status...")
                 
                 if old_status and old_status != new_status:
                     status_change = True
