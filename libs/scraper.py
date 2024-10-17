@@ -65,7 +65,8 @@ class Scraper(WebScraping):
             self.refresh_selenium()
             
         # Raise error if no results
-        raise print("Error: No results found.")
+        print("Error: No results found. Try again later.")
+        quit()
                 
     def get_property_data(self) -> dict:
         """ Extract data from current opened result
