@@ -99,7 +99,7 @@ class Scraper(WebScraping):
         selectors = {
             "address": 'h1',
             "county": 'dd:nth-child(2)',
-            "maps_link": 'a[href^="https://www.google.com/maps/"]',
+            "maps_link": 'br + a[href^="https://www.google.com/maps/"]',
             "sale_date": 'dd:nth-child(6)',
             "status": 'dd:nth-child(14)',
             "sale_type": 'dd:nth-child(4)',
