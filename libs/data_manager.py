@@ -68,7 +68,7 @@ class DataManager(SheetsManager):
     
         # Insert data in the bottom of the google sheet
         last_row = len(self.data)
-        data_row = data.values()
+        data_row = list(data.values())
         self.write_data([data_row], last_row + 2)
         
     def update_property(self, data):
@@ -86,6 +86,6 @@ class DataManager(SheetsManager):
         row_index = self.data.index(case_number_row)
         
         # Replace the row with the new data
-        data_row = data.values()
+        data_row = list(data.values())
         self.write_data([data_row], row_index + 2)
         
