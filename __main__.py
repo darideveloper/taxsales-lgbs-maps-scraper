@@ -75,6 +75,7 @@ def main():
                     data_manager.update_property(data)
                 else:
                     print("\t\tSaving property...")
+                    data["is_new"] = "Yes"
                     data_manager.insert_property(data)
             
             # Close property details and wait

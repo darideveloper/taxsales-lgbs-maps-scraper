@@ -71,7 +71,12 @@ class Scraper(WebScraping):
         """ Extract data from current opened result
         
         Returns:
-            dict: property data
+            list: property data gruoped
+                [
+                    {
+                        
+                    }
+                ]
                 street (str): street address
                 city (str): city
                 state (str): state
@@ -151,13 +156,14 @@ class Scraper(WebScraping):
             "sale_date": raw_data["sale_date"],
             "status": raw_data["status"],
             "sale_type": raw_data["sale_type"],
+            "is_new": "No",
             "status_changed": "No",
             "sale_notes": raw_data["sale_notes"],
             "judgment_date": raw_data["judgment_date"],
             "adjudget_value": f"${adjudget_value}",
             "es_min_bid": f"${es_min_bid}",
             "equity": f"${equity}",
-            "equity_percent": f"{equity_percent}%",
+            "equity_percent": "",
             "account_number": raw_data["account_number"],
             "case_number": raw_data["cause_number"],
             "case_style": raw_data["case_style"],
