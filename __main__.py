@@ -14,16 +14,21 @@ SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
 WAIT_SECONDS = int(os.getenv("WAIT_SECONDS"))
 
 
+# Show settings
+print("\n----------------------------------")
+print(">>>>>> Taxsales Lgbs Bot <<<<<<")
+print("GOOGLE_SHEET_LINK: ", GOOGLE_SHEET_LINK)
+print("PAGE_LINK: ", PAGE_LINK)
+print("SHEET_OUTPUT: ", SHEET_OUTPUT)
+print("WAIT_SECONDS: ", WAIT_SECONDS)
+print("----------------------------------\n")
+
+
 def main():
     # Main workflow: scrape each property found
     # and save data in google sheets
     
     current_page_link = PAGE_LINK
-
-    # Header
-    print("\n----------------------------------")
-    print("Taxsales Lgbs Bot")
-    print("----------------------------------\n")
 
     # Paths
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -37,7 +42,7 @@ def main():
     # Validate last page scraped and last status
     cache = data_manager.get_cache()
     if cache["last_page"] and not cache["finished"]:
-        print(f"Resuming scraping from page {cache['last_page']}...")
+        print(f"Resuming scraping from page '{cache['last_page']}'...")
         current_page_link = cache["last_page"]
         
     # Initialize scraper
