@@ -29,6 +29,7 @@ def main():
     # and save data in google sheets
     
     current_page_link = PAGE_LINK
+    current_page = 1
 
     # Paths
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -44,12 +45,12 @@ def main():
     if cache["last_page"] and not cache["finished"]:
         print(f"Resuming scraping from page '{cache['last_page']}'...")
         current_page_link = cache["last_page"]
+        current_page = cache["last_page_num"]
         
     # Initialize scraper
     scraper = Scraper(current_page_link)
     
     # Scraping counters
-    current_page = cache["last_page_num"]
     current_property = (current_page - 1) * 10 + 1
 
     while True:
