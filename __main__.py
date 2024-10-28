@@ -76,27 +76,11 @@ def main():
                 # Validate new case status
                 case_number = data["case_number"]
                 old_status = data_manager.get_case_status(case_number)
-                new_status = data["status"]
-                status_change = False
-                print(f"\t\tValidating case '{case_number}' status...")
-
-                if old_status and old_status != new_status:
-                    status_change = True
-                    data["status_change"] = "Yes"
-
-                # Log status change
-                if status_change:
-                    print("\t\tSaving status change...")
-                else:
-                    print("\t\tNo status change")
-
+                
                 # Update or insert data
                 if old_status:
-                    print("\t\tUpdating property...")
                     data_manager.update_property(data)
                 else:
-                    print("\t\tSaving property...")
-                    data["is_new"] = "Yes"
                     data_manager.insert_property(data)
 
             # Close property details and wait

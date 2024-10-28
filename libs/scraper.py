@@ -1,5 +1,6 @@
 import os
 from time import sleep
+from datetime import datetime
 
 from libs.web_scraping import WebScraping
 
@@ -147,6 +148,8 @@ class Scraper(WebScraping):
         equity_percent = 0
         if adjudget_value > 0:
             equity_percent = int(equity / adjudget_value * 10000) / 100
+            
+        today = datetime.now().strftime("%m/%d/%Y")
         
         return {
             "street": street,
@@ -158,8 +161,7 @@ class Scraper(WebScraping):
             "sale_date": raw_data["sale_date"],
             "status": raw_data["status"],
             "sale_type": raw_data["sale_type"],
-            "is_new": "No",
-            "status_changed": "No",
+            "date_pulled": today,
             "sale_notes": raw_data["sale_notes"],
             "judgment_date": raw_data["judgment_date"],
             "adjudget_value": f"${adjudget_value}",
