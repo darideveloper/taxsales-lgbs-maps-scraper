@@ -33,23 +33,23 @@ class DataManager(SheetsManager):
         data = list(filter(lambda row: row["Property Street"], data))
         self.data = data
 
-    def __get_case_number_row__(self, case_number: str) -> dict:
+    def __get_account_number_row__(self, account_number: str) -> dict:
         """ Get the row of a case number
 
         Args:
-            case_number (str): case number
+            account_number (str): case number
 
         Returns:
             dict: row of the case number
         """
 
         # Get the case row
-        case_number_row = list(filter(
-            lambda row: str(row["Case Number"]) == str(case_number),
+        account_number_row = list(filter(
+            lambda row: str(row["Account Number"]) in str(account_number),
             self.data
         ))
-        if case_number_row:
-            return case_number_row[0]
+        if account_number_row:
+            return account_number_row[0]
         else:
             return {}
         
@@ -65,18 +65,18 @@ class DataManager(SheetsManager):
         with open(self.cache_path, "w") as file:
             json.dump(data, file, indent=4)
 
-    def get_case_status(self, case_number: str) -> str:
+    def get_case_status(self, account_number: str) -> str:
         """ Get the status of a case
 
         Args:
-            case_number (str): case number
+            account_number (str): account number
 
         Returns:
             str: case status
         """
 
         # Get the case status
-        case_status_row = self.__get_case_number_row__(case_number)
+        case_status_row = self.__get_account_number_row__(account_number)
         if case_status_row:
             return case_status_row["Status"]
         else:
@@ -94,7 +94,8 @@ class DataManager(SheetsManager):
         # Insert data in the bottom of the google sheet
         last_row = len(self.data)
         data_row = list(data.values())
-        self.write_data([data_row], last_row + 2)
+        data_row_str = list(map(str, data_row))
+        self.write_data([data_row_str], last_row + 2)
 
     def update_property(self, data):
         """ Update a property data in the google sheet
@@ -106,9 +107,9 @@ class DataManager(SheetsManager):
         self.__update_sheet_data__()
 
         # Get row index of the case number
-        case_number = data["case_number"]
-        case_number_row = self.__get_case_number_row__(case_number)
-        row_index = self.data.index(case_number_row)
+        account_number = data["account_number"]
+        account_number_row = self.__get_account_number_row__(account_number)
+        row_index = self.data.index(account_number_row)
 
         # Replace the row with the new data
         data_row = list(data.values())

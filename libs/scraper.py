@@ -77,31 +77,33 @@ class Scraper(WebScraping):
             list: property data gruoped
                 [
                     {
-                        
+                        street (str): street address
+                        city (str): city
+                        state (str): state
+                        zip_code (str): zip code
+                        country (str): country
+                        maps_link (str): link to google maps
+                        sale_date (str): date of the sale
+                        status (str): status of the sale
+                        sale_type (str): type of sale
+                        date_pulled (str): date of the scraping
+                        sale_notes (str): notes of the sale
+                        judgment_date (str): date of the judgment
+                        adjudget_value (str): adjudget value
+                        es_min_bid (str): estimated minimum bid
+                        equity (str): equity
+                        equity_percent (str): equity percent
+                        account_number (str): account number
+                        case_number (str): case number
+                        case_style (str): case style
+                        link (str): link to the property
                     }
                 ]
-                street (str): street address
-                city (str): city
-                state (str): state
-                zip_code (str): zip code
-                county (str): county
-                maps_link (str): link to google maps
-                sale_date (str): date of the sale
-                status (str): status of the property
-                sale_notes (str): notes about the sale
-                judgment_date (str): date of the judgment
-                adjudget_value (float): value of the adjudget
-                es_min_bid (float): estimated minimum bid
-                equity (float): (adjudget_value - es_min_bid)
-                equity_percent (float): (equity / adjudget_value) * 100
-                account_number (int): account number
-                case_number (str): case number
-                case_style (str): case style
         """
         
         selectors = {
             "address": 'h1',
-            "county": 'dd:nth-child(2)',
+            "country": 'dd:nth-child(2)',
             "maps_link": 'br + a[href^="https://www.google.com/maps/"]',
             "sale_date": 'dd:nth-child(6)',
             "status": 'dd:nth-child(14)',
@@ -156,7 +158,7 @@ class Scraper(WebScraping):
             "city": city,
             "state": state,
             "zip_code": postal_code,
-            "county": raw_data["county"],
+            "country": raw_data["country"],
             "maps_link": maps_link,
             "sale_date": raw_data["sale_date"],
             "status": raw_data["status"],

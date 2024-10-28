@@ -11,6 +11,7 @@ load_dotenv()
 GOOGLE_SHEET_LINK = os.getenv("GOOGLE_SHEET_LINK")
 PAGE_LINK = os.getenv("PAGE_LINK")
 SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
+SHEET_INPUT = os.getenv("SHEET_INPUT")
 WAIT_SECONDS = int(os.getenv("WAIT_SECONDS"))
 
 
@@ -25,9 +26,9 @@ print("----------------------------------\n")
 
 
 def main():
+    
     # Main workflow: scrape each property found
     # and save data in google sheets
-    
     current_page_link = PAGE_LINK
     current_page = 1
 
@@ -39,6 +40,13 @@ def main():
     # Initialize data manager
     data_manager = DataManager(GOOGLE_SHEET_LINK, credentials_path,
                                cache_path, SHEET_OUTPUT)
+    
+    # # Validate if user want to pull only new cases
+    # print("Select an option:")
+    # print("1. Pull all cases")
+    # print("2. Pull only new cases")
+    # input_option = input("Option: ")
+    # if input_option == "1":
     
     # Validate last page scraped and last status
     cache = data_manager.get_cache()
@@ -74,8 +82,8 @@ def main():
             if data:
 
                 # Validate new case status
-                case_number = data["case_number"]
-                old_status = data_manager.get_case_status(case_number)
+                account_number = data["account_number"]
+                old_status = data_manager.get_case_status(account_number)
                 
                 # Update or insert data
                 if old_status:
