@@ -6,7 +6,7 @@ from libs.google_sheets import SheetsManager
 class DataManager(SheetsManager):
 
     def __init__(self, google_sheet_link: str, creds_path: os.path,
-                 cache_path: os.path, sheet_name: str = None):
+                 cache_path: os.path, sheet_output: str = None, sheet_input: str = None):
         """ Construtor of the class
 
         Args:
@@ -16,43 +16,40 @@ class DataManager(SheetsManager):
             sheet_name (str): name of the sheet
         """
 
-        super().__init__(google_sheet_link, creds_path, sheet_name)
+        super().__init__(google_sheet_link, creds_path, sheet_output)
+        
+        # Save sheets names
+        self.sheet_input = sheet_input
+        self.sheet_output = sheet_output
 
         # Get all data from google sheet
-        self.data = []
-        self.__update_sheet_data__()
+        self.data = {
+            sheet_input: [],
+            sheet_output: []
+        }
+        self.__update_sheet_data__(self.sheet_output)
+        self.__update_sheet_data__(self.sheet_input)
 
         # Save cache file
         self.cache_path = cache_path
 
-    def __update_sheet_data__(self):
-        """ Get all data from the google sheet with empty rows removed
+    def __update_sheet_data__(self, sheet_name: str):
+        """ Save in instance all data from the google sheet with empty rows removed
+        
+        Args:
+            sheet_name (str): name of the sheet
         """
+        
+        # Change to the correct sheet
+        self.set_sheet(sheet_name)
 
+        # Clean empty rows
         data = self.get_data()
         data = list(filter(lambda row: row["Property Street"], data))
-        self.data = data
-
-    def __get_account_number_row__(self, account_number: str) -> dict:
-        """ Get the row of a case number
-
-        Args:
-            account_number (str): case number
-
-        Returns:
-            dict: row of the case number
-        """
-
-        # Get the case row
-        account_number_row = list(filter(
-            lambda row: str(row["Account Number"]) in str(account_number),
-            self.data
-        ))
-        if account_number_row:
-            return account_number_row[0]
-        else:
-            return {}
         
+        # Save data
+        self.data[sheet_name] = data
+
     def __create_cache_file__(self):
         """ Create cache file with default data """
 
@@ -65,6 +62,29 @@ class DataManager(SheetsManager):
         with open(self.cache_path, "w") as file:
             json.dump(data, file, indent=4)
 
+    def get_account_number_row(self, account_number: str, sheet_name: str = "") -> dict:
+        """ Get the row of a case number
+
+        Args:
+            account_number (str): case number
+
+        Returns:
+            dict: row of the case number
+        """
+        
+        if not sheet_name:
+            sheet_name = self.sheet_output
+
+        # Get the case row
+        account_number_row = list(filter(
+            lambda row: str(row["Account Number"]) in str(account_number),
+            self.data[sheet_name]
+        ))
+        if account_number_row:
+            return account_number_row[0]
+        else:
+            return {}
+
     def get_case_status(self, account_number: str) -> str:
         """ Get the status of a case
 
@@ -76,7 +96,7 @@ class DataManager(SheetsManager):
         """
 
         # Get the case status
-        case_status_row = self.__get_account_number_row__(account_number)
+        case_status_row = self.get_account_number_row(account_number)
         if case_status_row:
             return case_status_row["Status"]
         else:
@@ -88,11 +108,13 @@ class DataManager(SheetsManager):
         Args:
             data (dict): property scraped data
         """
-
-        self.__update_sheet_data__()
+        
+        # Set the correct sheet and update data
+        self.set_sheet(self.sheet_output)
+        self.__update_sheet_data__(self.sheet_output)
 
         # Insert data in the bottom of the google sheet
-        last_row = len(self.data)
+        last_row = len(self.data[self.sheet_output])
         data_row = list(data.values())
         data_row_str = list(map(str, data_row))
         self.write_data([data_row_str], last_row + 2)
@@ -103,13 +125,15 @@ class DataManager(SheetsManager):
         Args:
             data (dict): property scraped data
         """
-
-        self.__update_sheet_data__()
+        
+        # Set the correct sheet and update data
+        self.set_sheet(self.sheet_output)
+        self.__update_sheet_data__(self.sheet_output)
 
         # Get row index of the case number
         account_number = data["account_number"]
-        account_number_row = self.__get_account_number_row__(account_number)
-        row_index = self.data.index(account_number_row)
+        account_number_row = self.get_account_number_row(account_number)
+        row_index = self.data[self.sheet_output].index(account_number_row)
 
         # Replace the row with the new data
         data_row = list(data.values())

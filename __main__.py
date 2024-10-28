@@ -21,6 +21,7 @@ print(">>>>>> Taxsales Lgbs Bot <<<<<<")
 print("GOOGLE_SHEET_LINK: ", GOOGLE_SHEET_LINK)
 print("PAGE_LINK: ", PAGE_LINK)
 print("SHEET_OUTPUT: ", SHEET_OUTPUT)
+print("SHEET_INPUT: ", SHEET_INPUT)
 print("WAIT_SECONDS: ", WAIT_SECONDS)
 print("----------------------------------\n")
 
@@ -39,14 +40,16 @@ def main():
 
     # Initialize data manager
     data_manager = DataManager(GOOGLE_SHEET_LINK, credentials_path,
-                               cache_path, SHEET_OUTPUT)
+                               cache_path, SHEET_OUTPUT, SHEET_INPUT)
     
-    # # Validate if user want to pull only new cases
-    # print("Select an option:")
-    # print("1. Pull all cases")
-    # print("2. Pull only new cases")
-    # input_option = input("Option: ")
-    # if input_option == "1":
+    # Validate if user want to pull only new cases
+    print("Select an option:")
+    print("1. Pull all cases")
+    print("2. Pull only new cases")
+    input_option = input("Option: ")
+    skip_input = False
+    if input_option == "2":
+        skip_input = True
     
     # Validate last page scraped and last status
     cache = data_manager.get_cache()
@@ -75,14 +78,27 @@ def main():
             property_found = scraper.open_property_details(property_index)
             if not property_found:
                 break
-            print(f"\tScraping property {current_property}...")
 
             # Extract property data
+            print(f"\tScraping property {current_property}...")
             data = scraper.get_property_data()
             if data:
+                
+                # Skip property if found in input sheet
+                account_number = data["account_number"]
+                print(f"\t\tAccount number: {account_number}")
+                account_row_input = data_manager.get_account_number_row(
+                    account_number,
+                    SHEET_INPUT
+                )
+                if account_row_input and skip_input:
+                    print("\t\tProperty found in input sheet. Skipping...")
+                    scraper.close_property_details()
+                    sleep(WAIT_SECONDS)
+                    current_property += 1
+                    continue
 
                 # Validate new case status
-                account_number = data["account_number"]
                 old_status = data_manager.get_case_status(account_number)
                 
                 # Update or insert data
@@ -90,6 +106,7 @@ def main():
                     print("\t\tUpdating property...")
                     data_manager.update_property(data)
                 else:
+                    print("\t\tInserting property...")
                     data_manager.insert_property(data)
 
             # Close property details and wait
