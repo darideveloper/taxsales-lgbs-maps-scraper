@@ -45,7 +45,7 @@ class DataManager(SheetsManager):
 
         # Get the case row
         case_number_row = list(filter(
-            lambda row: row["Case Number"] == case_number,
+            lambda row: str(row["Case Number"]) == str(case_number),
             self.data
         ))
         if case_number_row:

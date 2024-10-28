@@ -79,6 +79,7 @@ def main():
                 
                 # Update or insert data
                 if old_status:
+                    print("\t\tUpdating property...")
                     data_manager.update_property(data)
                 else:
                     data_manager.insert_property(data)
