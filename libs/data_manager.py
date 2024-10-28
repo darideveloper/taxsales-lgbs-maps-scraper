@@ -141,9 +141,17 @@ class DataManager(SheetsManager):
             dict: cache data
         """
         
+        try:
+            with open(self.cache_path, "r") as file:
+                cache_data = json.load(file)
+        except Exception:
+            cache_data = {}
+        
         # Create file if not exists
-        if not os.path.exists(self.cache_path):
+        if not cache_data:
             self.__create_cache_file__()
 
-        with open(self.cache_path, "r") as file:
-            return json.load(file)
+            with open(self.cache_path, "r") as file:
+                cache_data = json.load(file)
+                
+        return cache_data
