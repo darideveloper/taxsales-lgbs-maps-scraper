@@ -3,6 +3,7 @@ from time import sleep
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from gspread_formatting import format_cell_range, Color, CellFormat
 
 
 class SheetsManager ():
@@ -105,3 +106,21 @@ class SheetsManager ():
         start_cell = gspread.utils.rowcol_to_a1(row, start_col)
         end_cell = gspread.utils.rowcol_to_a1(row, end_col)
         return f"{start_cell}:{end_cell}"
+    
+    def set_bg_color(self, range: str, color_values: tuple):
+        """ Set the background color of a cell
+        
+        Args:
+            range (str): range of the cells
+            color (Color): color object
+        """
+        
+        # Definir el rango y el color de fondo
+        cell_range = range
+        bg_color = Color(*color_values)
+
+        # Formato de celdas con el color de fondo
+        cell_format = CellFormat(backgroundColor=bg_color)
+
+        # Aplicar el formato
+        format_cell_range(self.worksheet, cell_range, cell_format)

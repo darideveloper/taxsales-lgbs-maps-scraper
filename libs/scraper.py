@@ -95,7 +95,8 @@ class Scraper(WebScraping):
                         account_number (str): account number
                         case_number (str): case number
                         case_style (str): case style
-                        link (str): link to the property
+                        link (str): link to the property,
+                        address_error (bool): if there was an error in the address
                     }
                 ]
         """
@@ -130,8 +131,11 @@ class Scraper(WebScraping):
             state = address_parts[-2]
             city = " ".join(address_parts[:-2])
         except Exception:
-            print("\t\tError: Address format not recognized. Skipping property.")
-            return {}
+            print("\t\tError: Address format not recognized. Skipping property address.")
+            street = raw_data["address"]
+            city = ""
+            state = ""
+            postal_code = ""
         
         # Get google maps link
         maps_link = self.get_attrib(selectors["maps_link"], "href")
@@ -173,6 +177,7 @@ class Scraper(WebScraping):
             "case_number": raw_data["cause_number"],
             "case_style": raw_data["case_style"],
             "link": self.page_link,
+            "address_error": not bool(city),
         }
     
     def open_property_details(self, property_index: int) -> bool:

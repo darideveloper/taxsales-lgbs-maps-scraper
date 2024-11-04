@@ -61,6 +61,17 @@ class DataManager(SheetsManager):
         
         with open(self.cache_path, "w") as file:
             json.dump(data, file, indent=4)
+            
+    def __heightlight__(self, range: str):
+        """ Highlight a range in red color
+        
+        Args:
+            range (str): range to highlight
+        """
+        
+        color = (244 / 255, 204 / 255, 204 / 255)
+        self.set_bg_color(range, color)
+        print(f"\tHightlighted range: {range}")
 
     def get_account_number_row(self, account_number: str, sheet_name: str = "") -> dict:
         """ Get the row of a case number
@@ -118,6 +129,11 @@ class DataManager(SheetsManager):
         data_row = list(data.values())
         data_row_str = list(map(str, data_row))
         self.write_data([data_row_str], last_row + 2)
+        
+        # Hightlight the row in red if there is an address_error
+        if data["address_error"]:
+            range = self.get_range(last_row + 2, 1, len(data_row))
+            self.__heightlight__(range)
 
     def update_property(self, data):
         """ Update a property data in the google sheet
@@ -138,6 +154,11 @@ class DataManager(SheetsManager):
         # Replace the row with the new data
         data_row = list(data.values())
         self.write_data([data_row], row_index + 2)
+        
+        # Hightlight the row in red if there is an address_error
+        if data["address_error"]:
+            range = self.get_range(row_index + 2, 1, len(data_row))
+            self.__heightlight__(range)
 
     def update_page_cache(self, page_link: str, page_num: int, finished: bool):
         """ Save in local json file the last page link and
