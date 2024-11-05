@@ -59,15 +59,24 @@ class Scraper(WebScraping):
         print("Waiting for the page to load...")
         
         # Wait for results to laod
-        for _ in range(6):
-            results_num = self.get_elems(self.global_selectors["result"])
-            if len(results_num) > 0:
-                return
+        for _ in range(3):
+            
+            # Validate if results are loaded (3 times)
+            for _ in range(4):
+                results_num = self.get_elems(self.global_selectors["result"])
+                if len(results_num) > 0:
+                    return
+                sleep(2)
+                self.refresh_selenium()
+                
+            # Reload page
+            print("Error: Results not loaded. Reloading page...")
+            self.driver.refresh()
             sleep(2)
-            self.refresh_selenium()
+            self.__accept_terms__()
             
         # Raise error if no results
-        print("Error: No results found. Try again later.")
+        print("Error: No results found. Try again later or use a different link.")
         sys.exit()
                 
     def get_property_data(self) -> dict:
