@@ -1,4 +1,5 @@
 import os
+import sys
 from time import sleep
 from datetime import datetime
 
@@ -58,7 +59,7 @@ class Scraper(WebScraping):
         print("Waiting for the page to load...")
         
         # Wait for results to laod
-        for _ in range(3):
+        for _ in range(6):
             results_num = self.get_elems(self.global_selectors["result"])
             if len(results_num) > 0:
                 return
@@ -67,7 +68,7 @@ class Scraper(WebScraping):
             
         # Raise error if no results
         print("Error: No results found. Try again later.")
-        quit()
+        sys.exit()
                 
     def get_property_data(self) -> dict:
         """ Extract data from current opened result
