@@ -13,7 +13,7 @@ PAGE_LINK = os.getenv("PAGE_LINK")
 SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
 SHEET_INPUT = os.getenv("SHEET_INPUT")
 WAIT_SECONDS = int(os.getenv("WAIT_SECONDS"))
-
+SHOW_BROWSER = os.getenv("SHOW_BROWSER") == "True"
 
 # Show settings
 print("\n----------------------------------")
@@ -59,7 +59,7 @@ def main():
         current_page = cache["last_page_num"]
         
     # Initialize scraper
-    scraper = Scraper(current_page_link)
+    scraper = Scraper(current_page_link, not SHOW_BROWSER)
     
     # Scraping counters
     current_property = (current_page - 1) * 10 + 1

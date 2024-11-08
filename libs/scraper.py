@@ -41,6 +41,9 @@ class Scraper(WebScraping):
         # Prepare the scraper
         self.__accept_terms__()
         self.__wait_load_results__()
+        
+        # Take screenshot
+        self.screenshot("page_loaded")
     
     def __accept_terms__(self):
         """ Accept the terms of service. """
